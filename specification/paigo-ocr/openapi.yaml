@@ -1,0 +1,251 @@
+openapi: 3.0.1
+info:
+  title: AFS OCR API
+  description: AFS OCR API
+  version: '1.0'
+servers:
+  - url: https://api.bertelsmann.com/afs-ocr
+paths:
+  /api/v1/ocr:
+    post:
+      tags:
+        - ocr-controller
+      summary: Execute ocr
+      description: Execute ocr
+      operationId: postOcrUsingPOST
+      requestBody:
+        description: ocrRequestDto
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OCRRequest'
+            example:
+              binarization:
+                enabled: true
+                fileName: string
+                inWhite: true
+                inputData: string
+                method: BERNSEN
+                pageFrom: 0
+                pageTo: 0
+                par1: 0
+                par2: 0
+                radius: 0
+              correlationId: string
+              dataFileName: string
+              inputData: string
+              lang:
+                - string
+              oem: 0
+              outputTypes:
+                - pdf
+              pageFrom: 0
+              pageTo: 0
+              priority: FAST
+              psm: 0
+              skewCorrect:
+                enabled: true
+                fileName: string
+                inputData: string
+                pageFrom: 0
+                pageTo: 0
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OCRResponse'
+        '201':
+          description: Created
+          content:
+            '*/*': { }
+        '400':
+          description: Bad Request
+          content:
+            '*/*': { }
+        '401':
+          description: Unauthorized
+          content:
+            '*/*': { }
+        '403':
+          description: Forbidden
+          content:
+            '*/*': { }
+        '404':
+          description: Not Found
+          content:
+            '*/*': { }
+components:
+  schemas:
+    BinarizationRequest:
+      title: Binarization Request
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        fileName:
+          type: string
+        inWhite:
+          type: boolean
+        inputData:
+          type: string
+        method:
+          enum:
+            - BERNSEN
+            - CONTRAST
+            - MEAN
+            - MEDIAN
+            - MIDGREY
+            - NIBLACK
+            - OTSU
+            - PHANSALKAR
+            - SAUVOLA
+          type: string
+        pageFrom:
+          type: integer
+          format: int32
+        pageTo:
+          type: integer
+          format: int32
+        par1:
+          type: number
+          format: double
+        par2:
+          type: number
+          format: double
+        radius:
+          type: integer
+          format: int32
+      description: Only experimental at the moment!
+    OCRRequest:
+      title: OCR Request
+      type: object
+      properties:
+        binarization:
+          $ref: '#/components/schemas/BinarizationRequest'
+        correlationId:
+          type: string
+          description: The correlation id is used for logging throw the ocr process. If not set a correlation id will be generated an returned in response.
+        dataFileName:
+          type: string
+          description: Filename of the input data. The filename is required for mime type detection on preprocessing.
+        inputData:
+          type: string
+          description: Input data (Base64 encode String) for the ocr processing. Supported are PDF and all (image) formats supported by tesseract. For more information see tesseract documentation.
+        lang:
+          type: array
+          items:
+            type: string
+          description: 'List of languages that should be used for the ocr detection. Default is [deu].'
+        oem:
+          type: integer
+          description: 'Specify OCR Engine mode. The options are: 
+ 0 = Original Tesseract only. 
+ 1 = Neural nets LSTM only. 
+ 2 = Tesseract + LSTM. 
+ 3 = Default, based on what is available. 
+ 
+ For more information see tesseract documentation.
+'
+          format: int32
+        outputTypes:
+          type: array
+          items:
+            enum:
+              - pdf
+              - hocr
+              - tsv
+              - txt
+            type: string
+          description: 'List of output types the should be created. Default is [hocr].'
+        pageFrom:
+          type: integer
+          description: Start page for multipage documents like TIFF and PDF.
+          format: int32
+        pageTo:
+          type: integer
+          description: Last page for multipage documents like TIFF and PDF.
+          format: int32
+        priority:
+          enum:
+            - FAST
+            - NORMAL
+            - BULK
+          type: string
+          description: Priority for the tesseract execution.
+        psm:
+          type: integer
+          description: 'Set Tesseract to only run a subset of layout analysis and assume a certain form of image. The options are: 
+ 0 = Orientation and script detection (OSD) only. 
+ 1 = Automatic page segmentation with OSD. (Default, if not set) 
+ 2 = Automatic page segmentation, but no OSD, or OCR. 
+ 3 = Fully automatic page segmentation, but no OSD.  
+ 4 = Assume a single column of text of variable sizes. 
+ 5 = Assume a single uniform block of vertically aligned text. 
+ 6 = Assume a single uniform block of text. 
+ 7 = Treat the image as a single text line. 
+ 8 = Treat the image as a single word. 
+ 9 = Treat the image as a single word in a circle. 
+ 10 = Treat the image as a single character. 
+ 
+ For more information see tesseract documentation.
+'
+          format: int32
+        skewCorrect:
+          $ref: '#/components/schemas/SkewCorrectRequest'
+      description: Definition of an ocr request
+    OCRResponse:
+      title: OCR Response
+      type: object
+      properties:
+        cmdLineParameters:
+          type: string
+          description: Used parameters for the tesseract cmd
+        collaborationId:
+          type: string
+          description: The correlation id is used for logging throw the ocr process
+        errorMessage:
+          type: string
+        output:
+          type: object
+          additionalProperties:
+            type: string
+          description: Map with the OCR results. The map contains for every requested output type an entry with the data (Base64 encode string) of the result document
+        workerId:
+          type: string
+          description: Id of the tesseract worker that has executed the tesseract cmd
+    SkewCorrectRequest:
+      title: Skew Correct Request
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        fileName:
+          type: string
+        inputData:
+          type: string
+        pageFrom:
+          type: integer
+          format: int32
+        pageTo:
+          type: integer
+          format: int32
+      description: Only experimental at the moment!
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      name: Ocp-Apim-Subscription-Key
+      in: header
+    apiKeyQuery:
+      type: apiKey
+      name: subscription-key
+      in: query
+security:
+  - apiKeyHeader: [ ]
+  - apiKeyQuery: [ ]
+tags:
+  - name: imageprocessor-controller
+    description: Imageprocessor Controller
+  - name: ocr-controller
+    description: Ocr Controller

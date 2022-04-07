@@ -1,0 +1,90 @@
+openapi: 3.0.1
+info:
+  title: AZ Direct Address Verification
+  version: '1.0'
+servers:
+  - url: https://api.bertelsmann.com/azd-azo
+paths:
+  /validation:
+    post:
+      summary: Returns information about an address
+      description: Returns information about an address
+      operationId: post-validation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequest'
+            example:
+              firstname: string
+              secondname: string
+              street: string
+              streetnumber: string
+              streetadditional: string
+              zip: string
+              town: string
+              province: string
+              country: de
+              email: string
+              customercode: string
+              birthday: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationPost201ApplicationJsonResponse'
+components:
+  schemas:
+    AddressRequest:
+      required:
+        - country
+        - zip
+        - town
+        - street
+        - streetnumber
+      type: object
+      properties:
+        firstname:
+          type: string
+        secondname:
+          type: string
+        street:
+          type: string
+        streetnumber:
+          type: string
+        streetadditional:
+          type: string
+        zip:
+          type: string
+        town:
+          type: string
+        province:
+          type: string
+        country:
+          enum:
+            - de
+            - at
+            - ch
+          type: string
+        email:
+          type: string
+        customercode:
+          type: string
+        birthday:
+          type: string
+    ValidationPost201ApplicationJsonResponse:
+      type: object
+  securitySchemes:
+    apiKeyHeader:
+      type: apiKey
+      name: Ocp-Apim-Subscription-Key
+      in: header
+    apiKeyQuery:
+      type: apiKey
+      name: subscription-key
+      in: query
+security:
+  - apiKeyHeader: [ ]
+  - apiKeyQuery: [ ]

@@ -1,9 +1,17 @@
+# IDEs
 venv/
 .idea/
+.metadata/
+.vscode/
 
+# stuff that happens
 *.log
+*.pyc
+
+# stuff people don't know should be kept out of repo
 *.doc
 *.pdf
 *.zip
 *.xls
 *.xlsx
+
