@@ -1,0 +1,9 @@
+venv/
+.idea/
+
+*.log
+*.doc
+*.pdf
+*.zip
+*.xls
+*.xlsx
