@@ -19,9 +19,12 @@ def validate_address(address):
     return response.json()
 
 
-test_address = {
-  "firstname": "Markus Stahl",
-  "street": "Am Anger 33",
-  "town": "33332 Gutersloh"
-}
-print(validate_address(test_address))
+if __name__ == "__main__":
+    test_address = {
+      "firstname": "Markus Stahl",
+      "street": "Am Anger 33",
+      "town": "33332 Gutersloh"
+    }
+
+    result = validate_address(test_address)
+    print(json.dumps(result, indent=4, sort_keys=True))
